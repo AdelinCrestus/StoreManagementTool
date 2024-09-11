@@ -1,15 +1,13 @@
 package com.storeManagementTool.StoreManagementTool.dtos;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 @AllArgsConstructor
-@Setter
-@Getter
+@Data
 public class ProductAddDTO {
     private String name;
     private String description;
-    private double price;
-    private int quantity;
+    private Double price;
+    private Integer quantity;
 }
