@@ -3,12 +3,13 @@ package com.storeManagementTool.StoreManagementTool.controllers;
 import com.storeManagementTool.StoreManagementTool.dtos.ProductAddDTO;
 import com.storeManagementTool.StoreManagementTool.dtos.ProductDTO;
 import com.storeManagementTool.StoreManagementTool.services.ProductService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-//@Slf4j
+@Slf4j
 @RestController
 @RequestMapping("/store/products")
 public class ProductController {
@@ -23,7 +24,7 @@ public class ProductController {
     }
 
     @GetMapping
-    public List<ProductDTO> getAllProducts() {
-        return productService.findAll();
+    public ResponseEntity<List<ProductDTO>> getAllProducts() {
+        return ResponseEntity.ok(productService.findAll());
     }
 }
