@@ -1,12 +1,10 @@
 package com.storeManagementTool.StoreManagementTool.dtos;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 @AllArgsConstructor
-@Setter
-@Getter
+@Data
 public class ProductDTO {
     private Long id;
     private String name;
