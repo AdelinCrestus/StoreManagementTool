@@ -4,20 +4,18 @@ import com.storeManagementTool.StoreManagementTool.dtos.CartDTO;
 import com.storeManagementTool.StoreManagementTool.entities.UserEntity;
 import com.storeManagementTool.StoreManagementTool.mappers.ProductMapper;
 import com.storeManagementTool.StoreManagementTool.repositories.CartRepository;
-import com.storeManagementTool.StoreManagementTool.repositories.UserRepository;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 public class CartService {
 
     private final ProductMapper productMapper;
-    private final UserRepository userRepository;
     private final CartRepository cartRepository;
 
-    public CartService(ProductMapper productMapper, UserRepository userRepository, CartRepository cartRepository) {
+    public CartService(ProductMapper productMapper, CartRepository cartRepository) {
         this.productMapper = productMapper;
-        this.userRepository = userRepository;
         this.cartRepository = cartRepository;
     }
 
@@ -34,6 +32,7 @@ public class CartService {
 
         CartDTO cartDTO = productMapper.entityToDto(user.getCart());
         user.getCart().getProducts().clear();
+        log.info("Cart cleared, command was send");
         cartRepository.save(user.getCart());
         return cartDTO;
     }

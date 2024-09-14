@@ -76,6 +76,7 @@ public class ProductService {
     }
 
     public ProductDTO save(ProductAddDTO productAddDTO) {
+
         ProductEntity productEntity = productRepository.save(productMapper.dtoToEntity(productAddDTO));
         return productMapper.entityToDto(productEntity);
     }
@@ -90,6 +91,7 @@ public class ProductService {
             productEntity.setPrice(productDTO.getPrice());
             productEntity.setQuantity(productDTO.getQuantity());
             productRepository.save(productEntity);
+            log.info("Product with id: {} was updated", productEntity.getId());
             return productDTO;
         }
         throw new ProductNotFoundException();
@@ -101,6 +103,7 @@ public class ProductService {
         if (productEntityOptional.isPresent()) {
             ProductEntity productEntity = productEntityOptional.get();
             productEntity.setPrice(price);
+            log.info("Price of product with id: {} was changed to {}", productEntity.getId(), productEntity.getPrice());
             return productMapper.entityToDto(productRepository.save(productEntity));
         }
         throw new ProductNotFoundException();
@@ -111,6 +114,7 @@ public class ProductService {
         if (productEntityOptional.isPresent()) {
             ProductEntity productEntity = productEntityOptional.get();
             productEntity.setQuantity(quantity);
+            log.info("Quantity of product with id: {} was changed to {}", productEntity.getId(), quantity);
             return productMapper.entityToDto(productRepository.save(productEntity));
         }
         throw new ProductNotFoundException();
@@ -145,6 +149,7 @@ public class ProductService {
         userRepository.save(user);
         productRepository.save(productEntity);
         addedProduct.setId(productEntity.getId());
+        log.info("Product with id: {} was added to cart", addedProduct.getId());
         return productMapper.entityToDto(addedProduct);
     }
 
@@ -164,12 +169,14 @@ public class ProductService {
                 .findAll()
                 .stream()
                 .filter(product -> product.getName().equals(productEntityToDelete.getName()))
+                .filter(product -> !product.isInCart())
                 .findFirst()
                 .orElseThrow();
         productEntity.setQuantity(productEntity.getQuantity() + quantity);
         productRepository.save(productEntity);
         user.getCart().getProducts().remove(productEntityToDelete);
         cartRepository.save(user.getCart());
+        log.info("Product with id: {} was deleted from cart", productEntity.getId());
         delete(id);
     }
 
