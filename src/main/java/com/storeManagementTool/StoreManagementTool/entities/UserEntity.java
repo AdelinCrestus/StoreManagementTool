@@ -28,8 +28,8 @@ public class UserEntity implements UserDetails {
     private String email;
     private String password;
 
-    @OneToOne
-    private CartEntity cart = new CartEntity();
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private CartEntity cart;
 
     @Enumerated(EnumType.STRING)
     private Role role;

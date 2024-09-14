@@ -18,10 +18,7 @@ public class CartEntity {
     @GeneratedValue
     private int id;
 
-    @OneToOne
-    private UserEntity userEntity;
-
-    @OneToMany
-    private List<ProductEntity> products = new ArrayList<>();
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<ProductEntity> products;
 
 }

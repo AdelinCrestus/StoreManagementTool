@@ -2,6 +2,7 @@ package com.storeManagementTool.StoreManagementTool.config.auth;
 
 
 import com.storeManagementTool.StoreManagementTool.config.JwtService;
+import com.storeManagementTool.StoreManagementTool.entities.CartEntity;
 import com.storeManagementTool.StoreManagementTool.entities.Role;
 import com.storeManagementTool.StoreManagementTool.entities.UserEntity;
 import com.storeManagementTool.StoreManagementTool.repositories.UserRepository;
@@ -11,6 +12,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +29,10 @@ public class AuthenticationService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(Role.USER)
                 .email(request.getEmail())
+                .cart(new CartEntity())
                 .build();
+//        user.setCart(new CartEntity());
+        user.getCart().setProducts(new ArrayList<>());
         userRepository.save(user);
         var jwtToken = jwtService.generateToken(user);
         return  AuthenticationResponse.builder()

@@ -3,14 +3,13 @@ package com.storeManagementTool.StoreManagementTool.entities;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class ProductEntity {
 
     @Id
@@ -21,4 +20,5 @@ public class ProductEntity {
     private String description;
     private Double price;
     private Integer quantity;
+    private boolean inCart;
 }

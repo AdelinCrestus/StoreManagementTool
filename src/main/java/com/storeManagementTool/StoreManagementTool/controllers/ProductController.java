@@ -1,6 +1,5 @@
 package com.storeManagementTool.StoreManagementTool.controllers;
 
-import com.storeManagementTool.StoreManagementTool.dtos.CartDTO;
 import com.storeManagementTool.StoreManagementTool.dtos.ProductAddDTO;
 import com.storeManagementTool.StoreManagementTool.dtos.ProductDTO;
 import com.storeManagementTool.StoreManagementTool.entities.UserEntity;
@@ -51,7 +50,8 @@ public class ProductController {
     //TODO: To test what happens when I try to update a product that don't exists
 
     @GetMapping
-    public ResponseEntity<List<ProductDTO>> getAllProducts(@RequestParam @Nullable String name, @RequestParam @Nullable String description) {
+    public ResponseEntity<List<ProductDTO>> getAllProducts(@RequestParam @Nullable String name,
+                                                           @RequestParam @Nullable String description) {
         return ResponseEntity.ok(productService.findAll(name, description));
     }
 

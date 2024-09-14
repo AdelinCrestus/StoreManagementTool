@@ -8,14 +8,17 @@ import com.storeManagementTool.StoreManagementTool.entities.UserEntity;
 import com.storeManagementTool.StoreManagementTool.exceptions.InsufficientQuantityException;
 import com.storeManagementTool.StoreManagementTool.exceptions.ProductNotFoundException;
 import com.storeManagementTool.StoreManagementTool.mappers.ProductMapper;
+import com.storeManagementTool.StoreManagementTool.repositories.CartRepository;
 import com.storeManagementTool.StoreManagementTool.repositories.ProductRepository;
 import com.storeManagementTool.StoreManagementTool.repositories.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -27,30 +30,39 @@ public class ProductService {
     private final ProductMapper productMapper;
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
+    private final CartRepository cartRepository;
 
     @Autowired
-    public ProductService(ProductMapper productMapper, ProductRepository productRepository, UserRepository userRepository) {
+    public ProductService(ProductMapper productMapper, ProductRepository productRepository, UserRepository userRepository, CartRepository cartRepository) {
         this.productMapper = productMapper;
         this.productRepository = productRepository;
         this.userRepository = userRepository;
+        this.cartRepository = cartRepository;
     }
 
     public List<ProductDTO> findAll(String name, String description) {
         if (name == null && description == null) {
-            return productRepository.findAll().stream().map(productMapper::entityToDto).collect(Collectors.toList());
+            return productRepository.findAll()
+                    .stream()
+                    .filter(prod -> !prod.isInCart())
+                    .map(productMapper::entityToDto)
+                    .collect(Collectors.toList());
         } else if (description != null && name == null) {
             return productRepository.findProductEntitiesByDescriptionContainingIgnoreCase(description)
                     .stream()
+                    .filter(prod -> !prod.isInCart())
                     .map(productMapper::entityToDto)
                     .collect(Collectors.toList());
         } else if (description == null) {
             return productRepository.findProductEntitiesByNameContainingIgnoreCase(name)
                     .stream()
+                    .filter(prod -> !prod.isInCart())
                     .map(productMapper::entityToDto)
                     .collect(Collectors.toList());
         }
         return productRepository.findProductEntitiesByDescriptionContainingIgnoreCaseAndNameContainingIgnoreCase(description, name)
                 .stream()
+                .filter(prod -> !prod.isInCart())
                 .map(productMapper::entityToDto)
                 .collect(Collectors.toList());
     }
@@ -104,8 +116,13 @@ public class ProductService {
         throw new ProductNotFoundException();
     }
 
+    @Transactional
     public ProductDTO addProductToCartById(Long id, Integer quantity, UserEntity user) {
         Optional<ProductEntity> productEntityOptional = productRepository.findById(id);
+        user = userRepository.findByUsername(user.getUsername()).orElse(null);
+        if(user == null) {
+            throw new UsernameNotFoundException("User not found");
+        }
         if (productEntityOptional.isEmpty()) {
             throw new ProductNotFoundException();
         }
@@ -115,20 +132,48 @@ public class ProductService {
         }
 
         productEntity.setQuantity(productEntity.getQuantity() - quantity);
-        user.getCart().getProducts().add(productEntity);
+        ProductEntity addedProduct = ProductEntity.builder()
+                .name(productEntity.getName())
+                .description(productEntity.getDescription())
+                .price(productEntity.getPrice())
+                .quantity(quantity)
+                .inCart(true)
+                .build();
+        user.getCart().getProducts().add(
+               addedProduct
+        );
         userRepository.save(user);
-        return productMapper.entityToDto(productRepository.save(productEntity));
+        productRepository.save(productEntity);
+        addedProduct.setId(productEntity.getId());
+        return productMapper.entityToDto(addedProduct);
     }
 
-    public CartDTO finishOrder(UserEntity user) {
-
-        CartDTO cartDTO = productMapper.entityToDto(user.getCart());
-        user.getCart().getProducts().clear();
-        return cartDTO;
+    public void deleteProductFromCartById(Long id, UserEntity user) {
+//        user = userRepository.findByUsername(user.getUsername()).orElseThrow(
+//                () -> new UsernameNotFoundException("User not found")
+//        );
+        ProductEntity productEntityToDelete = user
+                .getCart()
+                .getProducts()
+                .stream()
+                .filter(product -> Objects.equals(product.getId(), id))
+                .findFirst()
+                .orElseThrow(ProductNotFoundException::new);
+        Integer quantity = productEntityToDelete.getQuantity();
+        ProductEntity productEntity = productRepository
+                .findAll()
+                .stream()
+                .filter(product -> product.getName().equals(productEntityToDelete.getName()))
+                .findFirst()
+                .orElseThrow();
+        productEntity.setQuantity(productEntity.getQuantity() + quantity);
+        productRepository.save(productEntity);
+        user.getCart().getProducts().remove(productEntityToDelete);
+        cartRepository.save(user.getCart());
+        delete(id);
     }
 
     public void delete(Long id) {
         productRepository.deleteById(id);
     }
-
 }
