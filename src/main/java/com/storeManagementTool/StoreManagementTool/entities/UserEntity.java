@@ -18,7 +18,7 @@ import java.util.List;
 @Builder
 @Entity
 @Table(name = "users")
-public class User implements UserDetails {
+public class UserEntity implements UserDetails {
 
     @Id
     @GeneratedValue
@@ -27,6 +27,9 @@ public class User implements UserDetails {
     private String username;
     private String email;
     private String password;
+
+    @OneToOne
+    private CartEntity cart = new CartEntity();
 
     @Enumerated(EnumType.STRING)
     private Role role;

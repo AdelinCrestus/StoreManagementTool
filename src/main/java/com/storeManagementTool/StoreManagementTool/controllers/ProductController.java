@@ -1,11 +1,14 @@
 package com.storeManagementTool.StoreManagementTool.controllers;
 
+import com.storeManagementTool.StoreManagementTool.dtos.CartDTO;
 import com.storeManagementTool.StoreManagementTool.dtos.ProductAddDTO;
 import com.storeManagementTool.StoreManagementTool.dtos.ProductDTO;
+import com.storeManagementTool.StoreManagementTool.entities.UserEntity;
 import com.storeManagementTool.StoreManagementTool.services.ProductService;
 import jakarta.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -57,9 +60,11 @@ public class ProductController {
         return ResponseEntity.ok(productService.findById(id));
     }
 
-    @PatchMapping("/buy/{id}")
-    public ResponseEntity<ProductDTO> buyProductById(@PathVariable Long id, @RequestParam Integer quantity) {
-        return ResponseEntity.ok(productService.buyProductById(id, quantity));
+    @PatchMapping("/addToCart/{id}")
+    public ResponseEntity<ProductDTO> addProductToCartById(@PathVariable Long id, @RequestParam Integer quantity,
+                                                           @AuthenticationPrincipal UserEntity user) {
+        log.info(user.getUsername());
+        return ResponseEntity.ok(productService.addProductToCartById(id, quantity, user));
     }
 
     @DeleteMapping({"/{id}"})

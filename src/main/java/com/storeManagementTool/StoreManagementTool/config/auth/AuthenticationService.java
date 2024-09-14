@@ -3,7 +3,7 @@ package com.storeManagementTool.StoreManagementTool.config.auth;
 
 import com.storeManagementTool.StoreManagementTool.config.JwtService;
 import com.storeManagementTool.StoreManagementTool.entities.Role;
-import com.storeManagementTool.StoreManagementTool.entities.User;
+import com.storeManagementTool.StoreManagementTool.entities.UserEntity;
 import com.storeManagementTool.StoreManagementTool.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,7 +21,7 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
 
     public AuthenticationResponse register(RegisterRequest request) {
-        var user = User.builder()
+        var user = UserEntity.builder()
                 .username(request.getUsername())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(Role.USER)

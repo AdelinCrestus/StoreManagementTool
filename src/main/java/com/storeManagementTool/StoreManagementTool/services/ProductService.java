@@ -1,12 +1,15 @@
 package com.storeManagementTool.StoreManagementTool.services;
 
+import com.storeManagementTool.StoreManagementTool.dtos.CartDTO;
 import com.storeManagementTool.StoreManagementTool.dtos.ProductAddDTO;
 import com.storeManagementTool.StoreManagementTool.dtos.ProductDTO;
 import com.storeManagementTool.StoreManagementTool.entities.ProductEntity;
+import com.storeManagementTool.StoreManagementTool.entities.UserEntity;
 import com.storeManagementTool.StoreManagementTool.exceptions.InsufficientQuantityException;
 import com.storeManagementTool.StoreManagementTool.exceptions.ProductNotFoundException;
 import com.storeManagementTool.StoreManagementTool.mappers.ProductMapper;
 import com.storeManagementTool.StoreManagementTool.repositories.ProductRepository;
+import com.storeManagementTool.StoreManagementTool.repositories.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,11 +26,13 @@ public class ProductService {
 
     private final ProductMapper productMapper;
     private final ProductRepository productRepository;
+    private final UserRepository userRepository;
 
     @Autowired
-    public ProductService(ProductMapper productMapper, ProductRepository productRepository) {
+    public ProductService(ProductMapper productMapper, ProductRepository productRepository, UserRepository userRepository) {
         this.productMapper = productMapper;
         this.productRepository = productRepository;
+        this.userRepository = userRepository;
     }
 
     public List<ProductDTO> findAll(String name, String description) {
@@ -99,7 +104,7 @@ public class ProductService {
         throw new ProductNotFoundException();
     }
 
-    public ProductDTO buyProductById(Long id, Integer quantity) {
+    public ProductDTO addProductToCartById(Long id, Integer quantity, UserEntity user) {
         Optional<ProductEntity> productEntityOptional = productRepository.findById(id);
         if (productEntityOptional.isEmpty()) {
             throw new ProductNotFoundException();
@@ -108,8 +113,18 @@ public class ProductService {
         if (productEntity.getQuantity() < quantity) {
             throw new InsufficientQuantityException();
         }
+
         productEntity.setQuantity(productEntity.getQuantity() - quantity);
+        user.getCart().getProducts().add(productEntity);
+        userRepository.save(user);
         return productMapper.entityToDto(productRepository.save(productEntity));
+    }
+
+    public CartDTO finishOrder(UserEntity user) {
+
+        CartDTO cartDTO = productMapper.entityToDto(user.getCart());
+        user.getCart().getProducts().clear();
+        return cartDTO;
     }
 
     public void delete(Long id) {
