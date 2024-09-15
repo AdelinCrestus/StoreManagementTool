@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/store/cart")
 public class CartController {
-//    private final ProductService productService;
     private final CartService cartService;
     private final ProductService productService;
 
@@ -31,7 +30,7 @@ public class CartController {
         return ResponseEntity.ok("Deleted product from cart");
     }
 
-    @PatchMapping("/purchase") //TODO : Change in GET
+    @PatchMapping("/purchase")
     public ResponseEntity<CartDTO> purchase(@AuthenticationPrincipal UserEntity user) {
         return ResponseEntity.ok(cartService.purchase(user));
     }

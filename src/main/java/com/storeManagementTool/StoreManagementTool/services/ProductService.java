@@ -154,9 +154,7 @@ public class ProductService {
     }
 
     public void deleteProductFromCartById(Long id, UserEntity user) {
-//        user = userRepository.findByUsername(user.getUsername()).orElseThrow(
-//                () -> new UsernameNotFoundException("User not found")
-//        );
+
         ProductEntity productEntityToDelete = user
                 .getCart()
                 .getProducts()

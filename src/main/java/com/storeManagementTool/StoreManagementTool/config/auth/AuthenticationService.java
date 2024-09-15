@@ -31,7 +31,6 @@ public class AuthenticationService {
                 .email(request.getEmail())
                 .cart(new CartEntity())
                 .build();
-//        user.setCart(new CartEntity());
         user.getCart().setProducts(new ArrayList<>());
         userRepository.save(user);
         var jwtToken = jwtService.generateToken(user);

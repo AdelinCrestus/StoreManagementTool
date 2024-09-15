@@ -31,7 +31,7 @@ public class StartupApplicationListener {
             newAdmin.setEmail("admin@email.com");
             newAdmin.setPassword(passwordEncoder.encode("admin"));
             newAdmin.setRole(Role.ADMIN);
-            newAdmin.setCart(new CartEntity()); // Presupunând că cart_id este necesar
+            newAdmin.setCart(new CartEntity());
             userRepository.save(newAdmin);
         }
     }

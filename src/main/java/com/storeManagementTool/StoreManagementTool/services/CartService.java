@@ -20,15 +20,10 @@ public class CartService {
     }
 
     public CartDTO getCart(UserEntity user) {
-//        user = userRepository.findByUsername(user.getUsername()).orElseThrow(
-//                () ->new UsernameNotFoundException("User not found"));
         return productMapper.entityToDto(user.getCart());
     }
 
     public CartDTO purchase(UserEntity user) {
-//        user = userRepository.findByUsername(user.getUsername()).orElseThrow(
-//                () -> new UsernameNotFoundException("User not found")
-//        );
 
         CartDTO cartDTO = productMapper.entityToDto(user.getCart());
         user.getCart().getProducts().clear();
