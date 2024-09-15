@@ -17,7 +17,7 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
-    private static final String SECRET_KEY = "tIqONun45b8bslZRcDsZAcaQu1Dw4MV4";
+    private static final String SECRET_KEY = "C1927637679A362E6E271CFD98CD5MFDPASMP12MM1[O1S]M1PM1M1";
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
@@ -69,8 +69,7 @@ public class JwtService {
     }
 
     private Key getSignInKey() {
-        String secretString = "C1927637679A362E6E271CFD98CD5MFDPASMP12MM1[O1S]M1PM1M1"; // Cheia trebuie să fie complexă și sigură
-        byte[] keyBytes = secretString.getBytes(StandardCharsets.UTF_8);
+        byte[] keyBytes = SECRET_KEY.getBytes(StandardCharsets.UTF_8);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 }
